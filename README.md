@@ -13,7 +13,7 @@ This repository holds my submission for the CIDRZ technical assessment, position
 | G. Executive briefing | [G-briefing.md](G-briefing.md) |
 | Tool-use declaration | [declaration.md](declaration.md) |
 
-All data in this repository is invented.
+All data in this repository is invented. Nothing here is real patient, CIDRZ, Ministry or SmartCare data.
 
 ## What I built, and what I stubbed
 
@@ -41,10 +41,12 @@ endpoint over HTTP.
 **You need:** Docker running, and Node 20 or later. The API needs no local JDK: it is built inside its container, and the Gradle wrapper fetches its own JDK when you run the tests.
 
 ```sh
+git clone https://github.com/law12th/cidrz-assessment.git
+cd cidrz-assessment
 ./scripts/run.sh
 ```
 
-That is the whole thing. It checks Docker is up, starts PostgreSQL, Redis and the API, waits for the API to report ready, loads the seed data if the database is empty, starts the screen, and opens it in a browser. Press Ctrl+C to stop; the containers stop with it and the data is kept, so the next run starts in seconds.
+That last line is the whole thing. It checks Docker is up, starts PostgreSQL, Redis and the API, waits for the API to report ready, loads the seed data if the database is empty, starts the screen, and opens it in a browser. Press Ctrl+C to stop; the containers stop with it and the data is kept, so the next run starts in seconds.
 
 | | |
 |---|---|
