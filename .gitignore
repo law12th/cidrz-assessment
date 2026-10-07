@@ -1,0 +1,17 @@
+# Build output — all regenerable
+backend/build/
+backend/.gradle/
+web/node_modules/
+web/dist/
+*.class
+*.tsbuildinfo
+
+# Submission archives: a zip of the repository must never be committed into it
+*.zip
+*.tar.gz
+
+# IDEs and OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
