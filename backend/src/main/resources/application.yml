@@ -1,0 +1,71 @@
+# Base configuration. Contains no secrets and no tokens: credentials come from the environment,
+# and the development tokens live only in the 'local' and 'test' profiles.
+spring:
+  application:
+    name: carelink-followup
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:carelink}
+    username: ${DB_USER:carelink}
+    password: ${DB_PASSWORD}
+  flyway:
+    # Flyway has no R2DBC driver, so migrations run over JDBC at startup against the same database.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:carelink}
+    user: ${DB_USER:carelink}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 250ms          # a slow cache must never become a slow request: both users fail open
+  jackson:
+    # The contract is snake_case throughout (appendix 15.3); the Java side stays camelCase.
+    # Jackson 3 writes java.time values as ISO-8601 strings by default, so nothing else is needed.
+    property-naming-strategy: SNAKE_CASE
+  reactor:
+    context-propagation: auto  # carries the correlation ID across thread hops into the log MDC
+
+server:
+  port: ${PORT:8080}
+
+logging:
+  structured:
+    format:
+      console: ecs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        # Readiness decides whether this node keeps taking traffic, so it names only what the node
+        # genuinely cannot serve without. Redis is an accelerator that fails open, so a Redis outage
+        # shows as degraded on /actuator/health but must not take a working clinic out of service.
+        # The database contributor is 'r2dbc', not 'db': there is no JDBC DataSource bean here,
+        # because Flyway builds its own. Naming a contributor that does not exist fails startup.
+        readiness:
+          include: readinessState,r2dbc
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+carelink:
+  time-zone: Africa/Lusaka
+  follow-up:
+    default-overdue-days: 7   # the brief's default threshold
+    due-soon-days: 7          # how far ahead "due soon" reaches
+    recent-window-days: 14    # how long after the threshold a patient counts as "recently missed"
+    default-page-size: 50
+    max-page-size: 200
+  rate-limit:
+    # Generous for a person working a list, far below the 3s polling loop in the Section C extract.
+    max-requests: 120
+    window: 1m
+  idempotency:
+    # Long enough to cover a facility that was offline for two days and is replaying its queue.
+    ttl: 72h

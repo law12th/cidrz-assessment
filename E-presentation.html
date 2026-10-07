@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>CareLink Follow-Up</title>
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+         color: #10151c; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 297mm; height: 210mm; padding: 15mm 18mm 12mm; page-break-after: always;
+           position: relative; display: flex; flex-direction: column; }
+  .slide:last-child { page-break-after: auto; }
+  .eyebrow { font-size: 10.5pt; letter-spacing: .09em; text-transform: uppercase; color: #5a6b80;
+             font-weight: 700; margin-bottom: 4mm; }
+  h1 { font-size: 30pt; line-height: 1.12; margin: 0 0 5mm; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 22pt; line-height: 1.15; margin: 0 0 6mm; font-weight: 700; letter-spacing: -.01em; }
+  p, li { font-size: 13.5pt; line-height: 1.5; margin: 0 0 3mm; }
+  ul { margin: 0 0 4mm; padding-left: 6mm; }
+  li { margin-bottom: 2.5mm; }
+  .lead { font-size: 15pt; color: #26323f; }
+  .cols { display: flex; gap: 10mm; flex: 1; }
+  .col { flex: 1; }
+  .card { border: 1pt solid #c9d4e0; border-left: 3pt solid #1762b8; padding: 4mm 5mm; margin-bottom: 4mm;
+          background: #f6f9fc; }
+  .card h3 { font-size: 13pt; margin: 0 0 1.5mm; font-weight: 700; }
+  .card p { font-size: 11.5pt; margin: 0; color: #35424f; }
+  .rej { color: #8a4b00; font-weight: 600; }
+  .num { font-size: 26pt; font-weight: 700; color: #1762b8; line-height: 1; }
+  .stat { display: flex; gap: 8mm; margin: 2mm 0 5mm; }
+  .stat div { flex: 1; border-top: 2pt solid #1762b8; padding-top: 2.5mm; }
+  .stat span { display: block; font-size: 10.5pt; color: #5a6b80; line-height: 1.3; }
+  .foot { position: absolute; bottom: 8mm; left: 18mm; right: 18mm; display: flex;
+          justify-content: space-between; font-size: 9.5pt; color: #8395a8;
+          border-top: .75pt solid #dde4ec; padding-top: 2.5mm; }
+  .tag { display: inline-block; background: #1762b8; color: #fff; font-size: 9.5pt; font-weight: 700;
+         padding: 1mm 2.5mm; border-radius: 1mm; margin-right: 2mm; }
+  .tag.warn { background: #8a4b00; }
+  .tag.ok { background: #10663a; }
+  table { border-collapse: collapse; width: 100%; font-size: 11.5pt; }
+  td, th { border-bottom: .75pt solid #dde4ec; padding: 2.2mm 2mm; text-align: left; vertical-align: top; }
+  th { color: #5a6b80; font-size: 10pt; text-transform: uppercase; letter-spacing: .05em; }
+</style></head><body>
+
+<!-- 1 -->
+<section class="slide">
+  <div class="eyebrow">CIDRZ technical assessment · Section B vertical slice</div>
+  <h1>CareLink Follow-Up</h1>
+  <p class="lead">Helping clinic staff find the patients who have missed an appointment — on a clinic
+     PC, over a link that is often not there.</p>
+  <div class="cols" style="margin-top:4mm">
+    <div class="col">
+      <h3 style="font-size:13pt">The problem, as I understood it</h3>
+      <ul>
+        <li>One list, per facility, of patients whose most recent visit set an appointment they did not keep.</li>
+        <li>It has to be right at 10,000 rows and on a six-year-old PC.</li>
+        <li>It has to keep working while the network does not.</li>
+        <li>It is personal health information, protected by law.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3 style="font-size:13pt">Where the brief was open, and what I assumed</h3>
+      <ul>
+        <li><strong>"More than n days"</strong> is strict: exactly 7 days is not yet listed.</li>
+        <li><strong>Only the most recent visit counts.</strong> Any later visit takes the patient off the list.</li>
+        <li><strong>"Today"</strong> is the facility's local date, not the server's.</li>
+        <li><strong>Facilities have a local server.</strong> The assumption I am least sure of — slide 4.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>All data invented. No real patient or organisational data.</span><span>1 / 8</span></div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="eyebrow">Architecture</div>
+  <h2>A clinic keeps working when the link does not</h2>
+  <svg viewBox="0 0 1150 300" style="width:100%;height:95mm">
+    <defs><marker id="a" markerWidth="9" markerHeight="9" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#35424f"/></marker></defs>
+    <rect x="4" y="18" width="470" height="264" rx="7" fill="#f6f9fc" stroke="#c9d4e0"/>
+    <text x="20" y="40" font-size="16" font-weight="700" fill="#5a6b80">FACILITY × 1,500 (clinic LAN)</text>
+    <rect x="22" y="58" width="150" height="62" rx="5" fill="#fff" stroke="#35424f" stroke-width="1.5"/>
+    <text x="97" y="83" font-size="16" text-anchor="middle" font-weight="700">Clinic browsers</text>
+    <text x="97" y="104" font-size="14" text-anchor="middle" fill="#5a6b80">no patient data stored</text>
+    <rect x="22" y="150" width="150" height="58" rx="5" fill="#fff" stroke="#35424f" stroke-width="1.5"/>
+    <text x="97" y="175" font-size="16" text-anchor="middle" font-weight="700">On-site lab</text>
+    <text x="97" y="195" font-size="14" text-anchor="middle" fill="#5a6b80">where present</text>
+    <rect x="212" y="50" width="246" height="210" rx="6" fill="#fff" stroke="#1762b8" stroke-width="2"/>
+    <text x="335" y="75" font-size="16" font-weight="700" text-anchor="middle" fill="#1762b8">FACILITY NODE</text>
+    <rect x="228" y="88" width="214" height="48" rx="4" fill="#eef4fb" stroke="#9db8d8"/>
+    <text x="335" y="110" font-size="15" text-anchor="middle" font-weight="700">CareLink app</text>
+    <text x="335" y="128" font-size="13" text-anchor="middle" fill="#5a6b80">Spring Boot, facility profile</text>
+    <rect x="228" y="148" width="214" height="44" rx="4" fill="#eef4fb" stroke="#9db8d8"/>
+    <text x="335" y="169" font-size="15" text-anchor="middle" font-weight="700">PostgreSQL</text>
+    <text x="335" y="185" font-size="13" text-anchor="middle" fill="#5a6b80">facility data + outbox</text>
+    <rect x="228" y="204" width="214" height="40" rx="4" fill="#eef4fb" stroke="#9db8d8"/>
+    <text x="335" y="229" font-size="15" text-anchor="middle" font-weight="700">Sync &amp; integration agent</text>
+    <rect x="676" y="18" width="470" height="264" rx="7" fill="#f6f9fc" stroke="#c9d4e0"/>
+    <text x="692" y="40" font-size="16" font-weight="700" fill="#5a6b80">NATIONAL (in-country data centre)</text>
+    <rect x="694" y="58" width="200" height="52" rx="5" fill="#fff" stroke="#35424f" stroke-width="1.5"/>
+    <text x="794" y="90" font-size="16" text-anchor="middle" font-weight="700">API gateway</text>
+    <rect x="694" y="126" width="200" height="60" rx="5" fill="#fff" stroke="#35424f" stroke-width="1.5"/>
+    <text x="794" y="152" font-size="16" text-anchor="middle" font-weight="700">CareLink app</text>
+    <text x="794" y="172" font-size="13" text-anchor="middle" fill="#5a6b80">national profile</text>
+    <rect x="694" y="202" width="200" height="56" rx="5" fill="#fff" stroke="#35424f" stroke-width="1.5"/>
+    <text x="794" y="226" font-size="16" text-anchor="middle" font-weight="700">PostgreSQL</text>
+    <text x="794" y="246" font-size="13" text-anchor="middle" fill="#5a6b80">primary + replica</text>
+    <rect x="928" y="92" width="196" height="52" rx="5" fill="#fff" stroke="#35424f" stroke-width="1.5"/>
+    <text x="1026" y="113" font-size="15" text-anchor="middle" font-weight="700">Reporting platform</text>
+    <text x="1026" y="132" font-size="13" text-anchor="middle" fill="#5a6b80">aggregates only</text>
+    <rect x="928" y="168" width="196" height="52" rx="5" fill="#fff" stroke="#35424f" stroke-width="1.5"/>
+    <text x="1026" y="189" font-size="15" text-anchor="middle" font-weight="700">Keycloak</text>
+    <text x="1026" y="208" font-size="13" text-anchor="middle" fill="#5a6b80">identity</text>
+    <line x1="172" y1="89" x2="206" y2="100" stroke="#35424f" stroke-width="1.6" marker-end="url(#a)"/>
+    <line x1="172" y1="179" x2="206" y2="216" stroke="#35424f" stroke-width="1.6" marker-end="url(#a)"/>
+    <line x1="458" y1="212" x2="688" y2="90" stroke="#1762b8" stroke-width="2.4" marker-end="url(#a)"/>
+    <line x1="688" y1="110" x2="458" y2="232" stroke="#1762b8" stroke-width="2.4" stroke-dasharray="7 5" marker-end="url(#a)"/>
+    <rect x="486" y="118" width="176" height="74" rx="5" fill="#ffffff" stroke="#dde4ec"/>
+    <text x="574" y="141" font-size="15" text-anchor="middle" font-weight="700" fill="#1762b8">private APN · mTLS</text>
+    <text x="574" y="163" font-size="13.5" text-anchor="middle" fill="#5a6b80">push changes (outbox)</text>
+    <text x="574" y="182" font-size="13.5" text-anchor="middle" fill="#5a6b80">pull feed ⟵ back</text>
+    <line x1="894" y1="156" x2="924" y2="130" stroke="#35424f" stroke-width="1.4" marker-end="url(#a)"/>
+    <line x1="894" y1="162" x2="924" y2="190" stroke="#35424f" stroke-width="1.4" marker-end="url(#a)"/>
+  </svg>
+  <p style="font-size:12.5pt;margin-top:2mm"><strong>The path, end to end:</strong> a clinician records a visit → the row
+     and an outbox entry are written in one local transaction, and the list updates at once →
+     when the link is up the agent pushes the batch → national applies it <em>idempotently</em> and
+     acknowledges → the district officer sees it. Offline, only the last step waits.</p>
+  <div class="foot"><span>Same artifact, two profiles. The node is the cache that survives the outage.</span><span>2 / 8</span></div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="eyebrow">Decisions · most confident</div>
+  <h2>Three I would defend</h2>
+  <div class="card">
+    <h3>1 · A server in every clinic, not an offline-first browser app</h3>
+    <p><span class="rej">Rejected:</span> IndexedDB in the browser. It puts patient data on shared, old PCs under tight
+       storage quotas, and every workstation would sync 10,000 patients alone — so two PCs in one clinic
+       drift apart from each other. <strong>The cost I accept: hardware, and a 1,500-node fleet to operate.</strong></p>
+  </div>
+  <div class="card">
+    <h3>2 · The whole rule runs in SQL, never in application memory</h3>
+    <p><span class="rej">Rejected:</span> load the facility's patients and filter in code — which is what the extract in
+       Section C does. One LATERAL probe per patient gives <strong>~130 ms for any page</strong> over 100,000 patients
+       and 400,000 visits, measured, including the total count.</p>
+  </div>
+  <div class="card">
+    <h3>3 · Replay safety lives in the database, not in the cache</h3>
+    <p><span class="rej">Rejected:</span> Redis as the source of truth for idempotency. A unique constraint on the
+       key holds across instances, restarts and a flushed cache. Redis only makes a replay cheap, fails open,
+       and is written <em>after</em> the row is durable — so a failed insert can never suppress a real retry.</p>
+  </div>
+  <div class="foot"><span>Each trade-off names what it costs, not only what it buys.</span><span>3 / 8</span></div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="eyebrow">Decisions · least confident</div>
+  <h2>The facility node fleet</h2>
+  <p class="lead">It is the right technical answer for outages that last days. It rests on two things
+     I assumed rather than confirmed: that the Ministry can <strong>fund</strong> 1,500 small servers, and that
+     districts can <strong>support</strong> them.</p>
+  <div class="cols" style="margin-top:3mm">
+    <div class="col">
+      <h3 style="font-size:13pt">What would change my mind</h3>
+      <ul>
+        <li>The Ministry cannot fund or support the hardware.</li>
+        <li>Pilot data shows the 400 well-connected sites rarely actually lose their link.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3 style="font-size:13pt">What I would do instead</h3>
+      <ul>
+        <li>Move those well-connected sites to direct online use of national.</li>
+        <li>Route their lab traffic through national.</li>
+        <li>Keep nodes only where connectivity genuinely demands them.</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:2mm"><strong>Why I am telling you this rather than defending it:</strong> the decision is
+     reversible in one direction only. Starting with nodes and removing them later is cheap; starting
+     online and discovering the 300 offline sites cannot work is not.</p>
+  <div class="foot"><span>The assumption, not the architecture, is the risk.</span><span>4 / 8</span></div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="eyebrow">Section B · built, not stubbed</div>
+  <h2>Both halves are real</h2>
+  <div class="stat">
+    <div><span class="num">100,000</span><span>seeded patients, 400,000 visits</span></div>
+    <div><span class="num">15,566</span><span>on the largest facility's list</span></div>
+    <div><span class="num">~130 ms</span><span>any page, measured end to end</span></div>
+    <div><span class="num">71</span><span>automated tests, all passing</span></div>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <h3 style="font-size:13pt">API — Java 25, reactive Spring Boot 4, PostgreSQL</h3>
+      <ul>
+        <li><code>GET /api/follow-up</code> to the contract; filtering, sorting, paging and counting all in SQL.</li>
+        <li><code>POST /{id}/contacted</code>, so "clinician writes, district officer cannot" is testable.</li>
+        <li>Role and facility scope taken from the token, never the query string.</li>
+        <li>Correlation ID on every request and log line; no patient data in logs — asserted by a test.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h3 style="font-size:13pt">Screen — React 19, TypeScript</h3>
+      <ul>
+        <li>Loading, empty and error states with a working retry.</li>
+        <li>Server-side paging: <strong>150,850 → 783</strong> DOM elements, <strong>2,953 KB → 14.6 KB</strong>.</li>
+        <li>A real table, keyboard throughout, status as word + shape + colour.</li>
+      </ul>
+      <p style="font-size:12pt"><span class="tag ok">Nothing stubbed</span> One command — <code>./scripts/run.sh</code> —
+         brings up the database, the API and the screen, and opens it.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Demonstrated live from this point.</span><span>5 / 8</span></div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="eyebrow">Section C · code review</div>
+  <h2>What I would have blocked</h2>
+  <table>
+    <tr><th style="width:9%"></th><th style="width:30%">Back-end extract</th><th style="width:30%">Front-end extract</th><th>Why these</th></tr>
+    <tr><td><span class="tag warn">1</span></td>
+        <td>SQL built by string concatenation</td>
+        <td>"Mark contacted" reports success it never had</td>
+        <td rowspan="3" style="font-size:12pt">Each of these already fails in <em>ordinary use</em>, not only under attack.
+            An apostrophe in <strong>O'Brien</strong> breaks the query. A clinician clicks and nothing happens.
+            A clinic with a keyboard cannot reach the button at all.<br><br>
+            The crash-level bugs I <em>did not</em> rank first: a crash announces itself in five minutes of
+            testing. These three ship looking fine and fail quietly in a clinic.</td></tr>
+    <tr><td><span class="tag warn">2</span></td>
+        <td>Live <code>sa</code> credentials committed in source</td>
+        <td>No error handling anywhere — "loading" for ever</td></tr>
+    <tr><td><span class="tag warn">3</span></td>
+        <td><code>catch (Exception) { /* ignore */ }</code> — the encounter is lost, the clinician is told it saved</td>
+        <td><code>&lt;div onClick&gt;</code>, unlabelled input, status by colour alone</td></tr>
+  </table>
+  <p style="margin-top:4mm;font-size:12.5pt">I refactored the <strong>front-end</strong> extract: its worst problems
+     need judgement about what a clinic needs on screen, where the back-end's have textbook answers
+     any reviewer would give.</p>
+  <div class="foot"><span>26 problems found, ranked critical / major / minor.</span><span>6 / 8</span></div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="eyebrow">Section D · for the whole panel</div>
+  <h2>Working offline, and the duplicate problem</h2>
+  <div class="cols">
+    <div class="col">
+      <h3 style="font-size:13pt">Why duplicates happened</h3>
+      <p style="font-size:12.5pt">The clinic queued its work while the link was down. When it came back the
+         queue was sent, timed out halfway, and was sent again <em>from the beginning</em> — so the first
+         half arrived twice. The system had no way to recognise work it had already done.</p>
+      <h3 style="font-size:13pt;margin-top:4mm">The fix, in one sentence</h3>
+      <p style="font-size:12.5pt">Every action carries its own reference number, created once in the clinic.
+         The server records that reference in the same breath as the work itself, so the <strong>second
+         arrival is recognised and ignored</strong> — like a cheque number, not a photocopy.</p>
+    </div>
+    <div class="col">
+      <h3 style="font-size:13pt">The duplicates already there</h3>
+      <p style="font-size:12.5pt"><strong>Nothing is deleted.</strong> Duplicate visits are found by rule and marked
+         superseded, staying readable.</p>
+      <p style="font-size:12.5pt"><strong>Duplicate patients are different.</strong> Merging two patient records merges
+         two clinical histories, and getting it wrong is a safety event. The system only
+         <em>proposes</em> a match; someone at the clinic confirms, because they can ring the patient;
+         the decision is recorded with a name against it, and it can be undone.</p>
+      <p style="font-size:12.5pt;margin-top:3mm"><strong>Nothing merges automatically. Ever.</strong></p>
+    </div>
+  </div>
+  <div class="foot"><span>When Monday's clinic edit meets Tuesday's district edit, a person decides — never last-write-wins.</span><span>7 / 8</span></div>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="eyebrow">Next</div>
+  <h2>What another week would buy</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="card"><h3>1 · Row-level security in PostgreSQL</h3>
+        <p>Facility scope enforced by the database as well as the application, so a future query that forgets
+           the check still cannot cross a facility boundary. The second line of defence I designed but did not build.</p></div>
+      <div class="card"><h3>2 · Keyset paging, and a measurement on real hardware</h3>
+        <p>Deep pages degrade with OFFSET. And every front-end figure I have quoted is from jsdom on a developer
+           laptop — I want the number from a six-year-old clinic PC.</p></div>
+    </div>
+    <div class="col">
+      <div class="card"><h3>3 · A test with a real screen reader</h3>
+        <p>I have tested with axe and Testing Library, which catch structure, not experience. NVDA on Windows is
+           what the clinics actually run.</p></div>
+      <div class="card"><h3>4 · The sync path itself</h3>
+        <p>Everything in Section D is designed and nothing of it is built. It is the largest gap between this
+           submission and a system a Ministry could deploy.</p></div>
+    </div>
+  </div>
+  <p style="margin-top:1mm;font-size:12.5pt"><strong>And the honest one:</strong> I would spend part of that week
+     deleting. The submission is longer than it needs to be, and the thinking would be easier to check if it were shorter.</p>
+  <div class="foot"><span>Thank you — questions welcome.</span><span>8 / 8</span></div>
+</section>
+</body></html>

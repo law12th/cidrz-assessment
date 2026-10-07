@@ -1,0 +1,27 @@
+# LOCAL DEVELOPMENT ONLY. These static tokens stand in for an identity provider; see the README
+# under "Authentication" for what replaces them in production.
+spring:
+  r2dbc:
+    password: ${DB_PASSWORD:carelink-local-only}
+  flyway:
+    password: ${DB_PASSWORD:carelink-local-only}
+
+carelink:
+  auth:
+    tokens:
+      dev-clinician-0101:
+        subject: clinician.fac0101
+        role: CLINICIAN
+        facility-id: FAC-0101
+      dev-clinician-0207:
+        subject: clinician.fac0207
+        role: CLINICIAN
+        facility-id: FAC-0207
+      dev-district-mwansa:
+        subject: district.mwansa
+        role: DISTRICT_OFFICER
+        district: Mwansa
+      dev-district-kalemba:
+        subject: district.kalemba
+        role: DISTRICT_OFFICER
+        district: Kalemba

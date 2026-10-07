@@ -1,0 +1,47 @@
+# Local development stack: PostgreSQL, Redis and the API. ALL DATA IS INVENTED.
+# The password below is for this local stack only; override with DB_PASSWORD.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: carelink
+      POSTGRES_USER: carelink
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-carelink-local-only}
+    ports:
+      - "${DB_PORT:-5433}:5432"   # 5433 on the host so it does not clash with a local PostgreSQL
+    volumes:
+      - ./db/seed:/seed:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carelink -d carelink"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6380}:6379"   # 6380 on the host so it does not clash with a local Redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Built from backend/ (Gradle, Spring Boot 4, Java 25). The service is named 'api' so that
+  # `docker compose stop api` and scripts/seed.sh read naturally.
+  api:
+    build: ./backend
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_PASSWORD: ${DB_PASSWORD:-carelink-local-only}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy

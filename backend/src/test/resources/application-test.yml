@@ -1,0 +1,21 @@
+# Test profile. Database and Redis settings are supplied by Testcontainers in the test class.
+carelink:
+  auth:
+    tokens:
+      test-clinician-0101:
+        subject: clinician.fac0101
+        role: CLINICIAN
+        facility-id: FAC-0101
+      test-clinician-0207:
+        subject: clinician.fac0207
+        role: CLINICIAN
+        facility-id: FAC-0207
+      test-district-mwansa:
+        subject: district.mwansa
+        role: DISTRICT_OFFICER
+        district: Mwansa
+      # Its own principal, so the rate-limit test's counter is not shared with any other test.
+      test-ratelimit-0101:
+        subject: ratelimit.fac0101
+        role: CLINICIAN
+        facility-id: FAC-0101
